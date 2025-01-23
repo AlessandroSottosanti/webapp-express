@@ -1,16 +1,15 @@
 import express from "express";
-import mysql from "mysql2";
+import moviesRouter from "./routers/movies.js"
 
 const app = express(); // Inizializza l'app Express
 
-const PORT = 3000; // Porta su cui il server ascolterà
+const port = process.env.SERVER_PORT; // Porta su cui il server ascolterà
 
 // Definisci una rotta di base
-app.get('/', (req, res) => {
-    res.send('Benvenuto in Express!');
-});
+app.use("/movies", moviesRouter);
 
+app.use(express.static("public"));
 // Avvia il server
-app.listen(PORT, () => {
-    console.log(`Server in ascolto su http://localhost:${PORT}`);
+app.listen(port, () => {
+    console.log(`Server in ascolto su http://localhost:${port}`);
 });
