@@ -1,0 +1,31 @@
+{
+  "name": "webapp-express",
+  "version": "1.0.0",
+  "description": "webapp express",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node --watch app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlessandroSottosanti/webapp-express.git"
+  },
+  "keywords": [
+    "express",
+    "webapp",
+    "api",
+    "mysql"
+  ],
+  "author": "Alessandro Sottosanti",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AlessandroSottosanti/webapp-express/issues"
+  },
+  "homepage": "https://github.com/AlessandroSottosanti/webapp-express#readme",
+  "dependencies": {
+    "express": "^4.21.2",
+    "mysql2": "^3.12.0"
+  }
+}
