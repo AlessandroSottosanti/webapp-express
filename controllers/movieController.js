@@ -1,9 +1,21 @@
 import connection from '../data/dbConnection.js';
 
 const index = (req, res, next) => {
+    let sql = "SELECT * FROM `movies` ";
+    const params = []
+    const filters = req.query;
+    console.log(filters);
 
-    const sql = "SELECT * FROM `movies` "
-    connection.query(sql, (err, results) => {
+    if(filters.search) {
+      sql += `
+        WHERE title LIKE ? ;
+        `;
+
+        params.push(`%${filters.search}%`);
+        
+    }
+    
+    connection.query(sql, params, (err, results) => {
         if (err) {
             return next(err);
         }
