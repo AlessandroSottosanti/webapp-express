@@ -4,15 +4,32 @@ const index = (req, res, next) => {
     let sql = "SELECT * FROM `movies` ";
     const params = []
     const filters = req.query;
+    const conditions = [];
+
     console.log(filters);
 
-    if(filters.search) {
-      sql += `
-        WHERE title LIKE ? ;
-        `;
-
+      // Gestione filtro "search"
+      if (filters.search) {
+        conditions.push("title LIKE ?");
         params.push(`%${filters.search}%`);
-        
+    }
+
+    // Gestione filtro "genre"
+    if (filters.genre) {
+        conditions.push("genre = ?");
+        params.push(filters.genre);
+    }
+
+    // Gestione filtro "age" (release_year)
+    if (filters.age) {
+        conditions.push("release_year = ?");
+        params.push(filters.age);
+    }
+
+
+
+    if (conditions.length > 0) {
+        sql += " WHERE " + conditions.join(" AND ");
     }
     
     connection.query(sql, params, (err, results) => {
@@ -50,24 +67,8 @@ const show = (req, res, next) => {
                 message: "Film non trovato",
             });
         }
-        //  else {
-        //      const movie = {
-        //         ...movies,
-        //          reviews: movies
-        //              .filter(row => row.movie_id)
-        //              .map(row => ({
-        //                  id: row.reviews.id,
-        //                  text: row.review_text,
-        //              })),
-        //      };
-
-        //      return res.status(200).json({
-        //          status: "success",
-        //          data: movie,
-        //      });
-        //  }
+        
         else {
-            // prendiamo gli ingredienti collegati alla pizza
             connection.query(reviewsSql, [id], (err, result) => {
                 if (err) {
                     return next(err);

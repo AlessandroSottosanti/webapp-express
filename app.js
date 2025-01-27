@@ -1,5 +1,7 @@
 import express from "express";
 import moviesRouter from "./routers/movies.js";
+import genresRouter from "./routers/genres.js";
+import releaseYearRouter from "./routers/releaseYear.js"
 import notFoundPage from './middlewares/notFoundRoute.js';
 import handleError from "./middlewares/handleError.js";
 import cors from "cors";
@@ -17,6 +19,11 @@ app.use(express.static("public"));
 
 // Definisci una rotta di base
 app.use("/movies", moviesRouter);
+
+app.use("/genres", genresRouter);
+
+app.use("/release-years", releaseYearRouter);
+
 
 app.use(notFoundPage.notFoundRoute);
 app.use(handleError);
