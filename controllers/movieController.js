@@ -50,39 +50,56 @@ const index = (req, res, next) => {
 const show = (req, res, next) => {
     const id = req.params.id;
 
-    const sql = "SELECT * FROM `movies` WHERE id = ?";
+    const sql = `
+        SELECT 
+            movies.*, 
+            CAST(AVG(reviews.vote) AS FLOAT) AS vote_avg 
+        FROM 
+            movies 
+        LEFT JOIN 
+            reviews 
+        ON 
+            movies.id = reviews.movie_id 
+        WHERE 
+            movies.id = ? 
+        GROUP BY 
+            movies.id`;
 
-    const reviewsSql = `SELECT reviews.* , movies.title 
-    FROM reviews 
-    LEFT JOIN movies 
-    ON movies.id = reviews.movie_id 
-    WHERE movies.id = ?`
+    const reviewsSql = `
+        SELECT 
+            reviews.*, 
+            movies.title 
+        FROM 
+            reviews 
+        LEFT JOIN 
+            movies 
+        ON 
+            movies.id = reviews.movie_id 
+        WHERE 
+            movies.id = ?`;
 
+    // Query dettagli film
     connection.query(sql, [id], (err, movies) => {
         if (err) {
-           return next(err);
+            return next(err); 
         }
-        else if (movies.length === 0) {
+        if (movies.length === 0 || movies[0].id === null) {
             return res.status(404).json({
                 message: "Film non trovato",
             });
-        }
-        
-        else {
-            connection.query(reviewsSql, [id], (err, result) => {
+        } else {
+            // Query recensioni
+            connection.query(reviewsSql, [id], (err, reviews) => {
                 if (err) {
-                    return next(err);
-                }
-
-                else {
+                    return next(err); 
+                } else {
                     const dataMovie = movies[0];
-                    console.log(result, movies[0]);
 
                     return res.status(200).json({
                         status: "success",
                         data: {
-                            ...dataMovie,
-                            result,
+                            ...dataMovie, // Dettagli del film
+                            reviews, // Dettagli recensioni
                         },
                     });
                 }
@@ -90,6 +107,7 @@ const show = (req, res, next) => {
         }
     });
 };
+
 
 export default {
     index,
