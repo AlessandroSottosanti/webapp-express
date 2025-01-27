@@ -6,7 +6,7 @@ const router = express.Router();
 // INDEX
 router.get("/", movieController.index);
 
-router.get('/:id', movieController.show);
+router.get('/:slug', movieController.show);
 
 
 export default router;

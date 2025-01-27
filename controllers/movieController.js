@@ -48,7 +48,7 @@ const index = (req, res, next) => {
 };
 
 const show = (req, res, next) => {
-    const id = req.params.id;
+    const slug = req.params.slug;
 
     const sql = `
         SELECT 
@@ -61,7 +61,7 @@ const show = (req, res, next) => {
         ON 
             movies.id = reviews.movie_id 
         WHERE 
-            movies.id = ? 
+            movies.slug = ? 
         GROUP BY 
             movies.id`;
 
@@ -76,20 +76,20 @@ const show = (req, res, next) => {
         ON 
             movies.id = reviews.movie_id 
         WHERE 
-            movies.id = ?`;
+            movies.slug = ?`;
 
     // Query dettagli film
-    connection.query(sql, [id], (err, movies) => {
+    connection.query(sql, [slug], (err, movies) => {
         if (err) {
             return next(err); 
         }
-        if (movies.length === 0 || movies[0].id === null) {
+        if (movies.length === 0 || movies[0].slug === null) {
             return res.status(404).json({
                 message: "Film non trovato",
             });
         } else {
             // Query recensioni
-            connection.query(reviewsSql, [id], (err, reviews) => {
+            connection.query(reviewsSql, [slug], (err, reviews) => {
                 if (err) {
                     return next(err); 
                 } else {
