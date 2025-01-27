@@ -14,19 +14,13 @@ const index = (req, res, next) => {
         params.push(`%${filters.search}%`);
     }
 
-    // Gestione filtro "genre"
-    if (filters.genre) {
-        conditions.push("genre = ?");
-        params.push(filters.genre);
+    // Gestione filtri con valori "Statici", le cui chiavi corrispondono alle colonne del db
+    for(const key in req.query) {
+        if(key !== "search") {
+            conditions.push(`${key} = ?`);
+            params.push(req.query[key]);
+        }
     }
-
-    // Gestione filtro "age" (release_year)
-    if (filters.age) {
-        conditions.push("release_year = ?");
-        params.push(filters.age);
-    }
-
-
 
     if (conditions.length > 0) {
         sql += " WHERE " + conditions.join(" AND ");
