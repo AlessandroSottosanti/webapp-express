@@ -8,15 +8,15 @@ const index = (req, res, next) => {
 
     console.log(filters);
 
-      // Gestione filtro "search"
-      if (filters.search) {
+    // Gestione filtro "search"
+    if (filters.search) {
         conditions.push("title LIKE ?");
         params.push(`%${filters.search}%`);
     }
 
     // Gestione filtri con valori "Statici", le cui chiavi corrispondono alle colonne del db
-    for(const key in req.query) {
-        if(key !== "search") {
+    for (const key in req.query) {
+        if (key !== "search") {
             conditions.push(`${key} = ?`);
             params.push(req.query[key]);
         }
@@ -25,7 +25,7 @@ const index = (req, res, next) => {
     if (conditions.length > 0) {
         sql += " WHERE " + conditions.join(" AND ");
     }
-    
+
     connection.query(sql, params, (err, results) => {
         if (err) {
             return next(err);
@@ -75,7 +75,7 @@ const show = (req, res, next) => {
     // Query dettagli film
     connection.query(sql, [slug], (err, movies) => {
         if (err) {
-            return next(err); 
+            return next(err);
         }
         if (movies.length === 0 || movies[0].slug === null) {
             return res.status(404).json({
@@ -85,7 +85,7 @@ const show = (req, res, next) => {
             // Query recensioni
             connection.query(reviewsSql, [slug], (err, reviews) => {
                 if (err) {
-                    return next(err); 
+                    return next(err);
                 } else {
                     const dataMovie = movies[0];
 
@@ -102,8 +102,79 @@ const show = (req, res, next) => {
     });
 };
 
+// const reviewValidate = (reqBody, res, next) => {
+//     const { name, vote, text } = reqBody;
+
+
+   
+//     next();
+// }
+
+const storeReview = (req, res, next) => {
+    const movieId = req.params.id;
+    console.log(movieId);
+    console.log(req.body);
+
+    const { name, vote, text } = req.body;
+
+    
+    // reviewValidate(req.body, res)
+    if(isNaN(vote) || vote > 5 || vote < 0) {
+        return res.status(400).json({
+            status: "fail",
+            message: "il voto deve essere un valore numerico compreso tra 0 e 5",
+        });
+    }
+
+    if(name.length <= 3) {
+        return res.status(400).json({
+            status: "fail",
+            message: "Il nome deve contenere più di 3 caratteri",
+        });
+    }
+
+    if(text && text.length > 0 && text.length < 5) {
+        return res.status(400).json({
+            status: "fail",
+            message: "Il testo deve essere lungo almeno 6 caratteri",
+        });
+    }
+    // verifichiamo che il film con id movieId esiste
+    const movieSql = `
+        SELECT *
+        FROM movies
+        WHERE id = ?`;
+
+    connection.query(movieSql, [movieId], (err, results) => {
+        if (err) {
+            return next(err);
+        }
+        if(results.length === 0) {
+            return res.status(404).json({
+                status: "fail",
+                message: "Film non trovato",
+            });
+        }
+
+        const sql = `
+            INSERT INTO reviews(movie_id, name,vote,text)
+            VALUES (?, ?, ?, ?);
+        `;
+
+        connection.query(sql, [movieId, name, vote, text], (err, results) => {
+            if(err) {
+                return next(err); 
+            }
+            res.status(201).json({
+                status: "success",
+                message: "Recensione aggiunta"
+            });
+        })
+    })
+}
 
 export default {
     index,
-    show
+    show,
+    storeReview
 };
