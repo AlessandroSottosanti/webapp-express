@@ -119,7 +119,7 @@ const storeReview = (req, res, next) => {
 
     
     // reviewValidate(req.body, res)
-    if(isNaN(vote) || vote > 5 || vote < 0) {
+    if(isNaN(vote) ||  vote < 1 || vote > 5 ) {
         return res.status(400).json({
             status: "fail",
             message: "il voto deve essere un valore numerico compreso tra 0 e 5",
@@ -149,12 +149,7 @@ const storeReview = (req, res, next) => {
         if (err) {
             return next(err);
         }
-        if(results.length === 0) {
-            return res.status(404).json({
-                status: "fail",
-                message: "Film non trovato",
-            });
-        }
+        
 
         const sql = `
             INSERT INTO reviews(movie_id, name,vote,text)
