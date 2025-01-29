@@ -1,3 +1,4 @@
+import slugify from 'slugify';
 import connection from '../data/dbConnection.js';
 
 const index = (req, res, next) => {
@@ -168,8 +169,39 @@ const storeReview = (req, res, next) => {
     })
 }
 
+const store = (req, res , next) => {
+    console.log(`salvataggio file`);
+    const imageName = req.file.filename;
+    const {title, director, releaseYear, genre, abstract}= req.body;
+
+    console.log(req.body);
+    
+    const slug = slugify(title ,{
+        lower: true,
+        strict: true
+    });
+ 
+    const sql = `
+    INSERT INTO movies(slug, title, director , genre, release_year, abstract, image)
+    VALUES(?,?,?,?,?,?)
+    `
+
+    connection.query(sql, [slug, title, director, releaseYear, genre, abstract, imageName], (err, results) => {
+        if(err){
+            return next(err); 
+        }
+
+        return  res.status(201).json({
+            status: "success",
+            message: "Film salvato con successo"
+        });
+    })
+   
+}
+
 export default {
     index,
     show,
-    storeReview
+    storeReview,
+    store
 };
