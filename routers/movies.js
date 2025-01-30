@@ -10,11 +10,16 @@ router.get("/", movieController.index);
 // SHOW
 router.get('/:slug', movieController.show);
 
-// SALVATAGGIO FILM
+// SALVATAGGIO 
 router.post(`/`, upload.single("image"), movieController.store);
 
 // SALVATAGGIO RECENSIONE
 router.post(`/:id`, movieController.storeReview);
 
+// ELIMINAZIONE 
+router.delete(`/:id`, movieController.destroy)
+
+// AGGIORNAMENTO
+router.put(`/:id`, upload.single("image") , movieController.modify)
 
 export default router;
